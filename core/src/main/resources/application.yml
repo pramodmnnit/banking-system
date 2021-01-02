@@ -1,0 +1,62 @@
+server:
+  port: 8030
+  servlet:
+    context-path: /banking/system
+  max-threads: 512
+  min-threads: 64
+  accesslog:
+    dir: "."
+    enabled: true
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types: application/json
+
+isProd: false
+
+persistence:
+  user: root
+  password: root
+  databaseName: banking_system
+  serverName: localhost
+  portNumber: 3306
+  maximumPoolSize: 5
+  connectionTimeout: 5000
+  jdbcUrl: "jdbc:mysql://localhost:3306/banking_system?zeroDateTimeBehavior=convertToNull&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false"
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: "banking-system"
+  cloud:
+    consul:
+      enabled: false
+      discovery:
+        healthCheckPath: ${server.servlet.context-path}/actuator/health
+        healthCheckInterval: 15s
+        instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:1}}
+        tags: application_type=${spring.application.name}, application_port=${server.port}, metrics_path=${server.servlet.context-path}/actuator/prometheus, application_path=${server.servlet.context-path}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    metrics:
+      enabled: true
+    web:
+      exposure:
+        include: '*'
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    org.springframework.web: ERROR
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
